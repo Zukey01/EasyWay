@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // ⚠️ Usa tu IP local en vez de localhost si estás en Expo Web
 const api = axios.create({
-  baseURL: 'http://192.168.1.69:3000/api', // Reemplazar con tu IP local real
+  baseURL: 'http://192.168.30.91:3000/api', // Reemplazar con tu IP local real
 });
 
 export { api };

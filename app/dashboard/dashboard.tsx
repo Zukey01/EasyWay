@@ -17,7 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
 import { BottomSheet } from 'react-native-sheet';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import CustomDrawerContent from './CustomDrawerContent';
+import CustomDrawerContent from '../dashboard/CustomDrawerContent';
 
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia2V2c3luZHJvbWUiLCJhIjoiY21icDVoNGtuMDB5dDJ2cTU4bms0aWttcCJ9.lW4Mf_0RgTSdhTpTCbC8MQ';
@@ -193,7 +193,7 @@ function DashboardScreen({ navigation }: any) {
             <View style={styles.reportButtonContainer}>
               <TouchableOpacity style={styles.alertButton} onPress={() => navigation.navigate('reportarBache')}>
                 <Image
-                  source={require('../assets/images/reporte.png')}
+                  source={require('../../assets/images/reporte.png')}
                   style={{ width: 24, height: 24, resizeMode: 'contain' }}
                 />
               </TouchableOpacity>

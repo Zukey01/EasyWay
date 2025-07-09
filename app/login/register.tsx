@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './App';
-import { register } from '../src/api/api';
+import { RootStackParamList } from '../App';
+import { register } from '../../src/api/api'; 
 import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function Register() {
@@ -66,7 +66,7 @@ export default function Register() {
           <Icon name="arrow-back" size={28} color="#0B7D03" />
         </TouchableOpacity>
 
-        <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+        <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
         <Text style={styles.title}>Registro</Text>
         <Text style={styles.subtitle}>Crea tu cuenta llenando los siguientes datos.</Text>
 

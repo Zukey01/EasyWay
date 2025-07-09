@@ -12,7 +12,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './App';
+import { RootStackParamList } from '../App';
 
 export default function EditarPerfil() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -30,7 +30,7 @@ export default function EditarPerfil() {
 
       <View style={styles.avatarContainer}>
         <Image
-          source={require('../assets/images/logo.png')}
+          source={require('../../assets/images/logo.png')}
           style={styles.avatar}
         />
         <Text style={styles.changePhotoText}>Cambiar foto</Text>

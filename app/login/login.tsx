@@ -14,8 +14,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RootStackParamList } from './App';
-import { login } from '../src/api/api';
+import { RootStackParamList } from '../App';
+import { login } from '../../src/api/api';
 
 export default function Login() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -59,7 +59,7 @@ export default function Login() {
           <Icon name="arrow-back" size={28} color="#0B7D03" />
         </TouchableOpacity>
 
-        <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+        <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>Inicio de Sesión</Text>
         <Text style={styles.subtitle}>Inicia sesión con tu cuenta de Easy Way.</Text>
 

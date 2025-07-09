@@ -12,7 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './App';
+import { RootStackParamList } from '../App';
 
 export default function Perfil() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -46,7 +46,7 @@ export default function Perfil() {
 
       <View style={styles.profileSection}>
         <Image
-          source={require('../assets/images/logo.png')}
+          source={require('../../assets/images/logo.png')}
           style={styles.avatar}
         />
 

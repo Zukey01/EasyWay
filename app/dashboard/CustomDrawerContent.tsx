@@ -37,7 +37,7 @@ export default function CustomDrawerContent() {
       <View style={styles.maincontainer}>
         <View style={styles.containerone}>
           <Image
-            source={require('../assets/images/logo.png')} // ✅ Asegúrate de que exista
+            source={require('../../assets/images/logo.png')} // ✅ Asegúrate de que exista
             style={styles.logo}
             resizeMode="contain"
           />

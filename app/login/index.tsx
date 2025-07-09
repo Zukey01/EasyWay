@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from './App';
+import { RootStackParamList } from '../App';
 
 
 
@@ -14,7 +14,7 @@ const WelcomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+      <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
 
       <Text style={styles.welcomeText}>
         Bienvenido a <Text style={styles.brandName}>Easy Way</Text>
