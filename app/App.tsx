@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -18,6 +17,10 @@ import RecuperarScreen from '../app/login/recuperar';
 import RegisterScreen from '../app/login/register';
 import ReportarBacheScreen from '../app/reportarbache/reportarBache';
 import StateUserProvider from '../app/context/stateUser';
+import AjustesScreen from '../app/tools/ajustes';
+import CondicionesScreen from '../app/privacidad/condiciones';
+import PrivacyPolicyScreen from '../app/privacidad/privacidad';
+import HistorialScreen from '../app/rutas/historial';
 
 export type RootStackParamList = {
   index: undefined;
@@ -34,6 +37,10 @@ export type RootStackParamList = {
   reportarBache: undefined;
   ingresarCodigo: { email: string; codigoGenerado: string };
   perfil: undefined;
+  ajustes: undefined;
+  condiciones: undefined;
+  privacidad: undefined;
+  historial: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,6 +62,10 @@ export default function App() {
           <Stack.Screen name="reportarBache" component={ReportarBacheScreen} />
           <Stack.Screen name="ingresarCodigo" component={IngresarCodigoScreen} />
           <Stack.Screen name="perfil" component={PerfilScreen} />
+          <Stack.Screen name="ajustes" component={AjustesScreen}/>
+          <Stack.Screen name="condiciones" component={CondicionesScreen} />
+          <Stack.Screen name="privacidad" component={PrivacyPolicyScreen} />
+          <Stack.Screen name="historial" component={HistorialScreen} />
         </Stack.Navigator>
     </StateUserProvider>
   );

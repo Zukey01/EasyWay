@@ -13,8 +13,12 @@ const WelcomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
-    <View style={styles.container}>
-      <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+   <View style={styles.container}>
+      <Image
+        source={require('../../assets/images/logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
       <Text style={styles.welcomeText}>
         Bienvenido a <Text style={styles.brandName}>Easy Way</Text>
@@ -31,8 +35,14 @@ const WelcomeScreen = () => {
 
       <Text style={styles.termsText}>
         Al continuar, aceptas las{' '}
-        <Text style={styles.link}>Condiciones del Servicio</Text> y la{' '}
-        <Text style={styles.link}>Política de Privacidad</Text> de Easy Way
+        <Text style={styles.link} onPress={() => navigation.navigate('condiciones')}>
+          Condiciones del Servicio
+        </Text>{' '}
+        y la{' '}
+        <Text style={styles.link} onPress={() => navigation.navigate('privacidad')}>
+          Política de Privacidad
+        </Text>{' '}
+        de Easy Way
       </Text>
     </View>
   );

@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,11 +15,10 @@ import {
   View
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import { BottomSheet } from 'react-native-sheet';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomDrawerContent from '../dashboard/CustomDrawerContent';
-
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia2V2c3luZHJvbWUiLCJhIjoiY21icDVoNGtuMDB5dDJ2cTU4bms0aWttcCJ9.lW4Mf_0RgTSdhTpTCbC8MQ';
 
@@ -33,12 +33,11 @@ const Drawer = createDrawerNavigator();
 export default function Dashboard() {
   return (
     <Drawer.Navigator
-  screenOptions={{ headerShown: false }}
-  drawerContent={(props) => <CustomDrawerContent {...props} />}
->
-  <Drawer.Screen name="Mapa" component={DashboardScreen} />
-</Drawer.Navigator>
-
+      screenOptions={{ headerShown: false }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    >
+      <Drawer.Screen name="Mapa" component={DashboardScreen} />
+    </Drawer.Navigator>
   );
 }
 
@@ -47,6 +46,7 @@ function DashboardScreen({ navigation }: any) {
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [zoom, setZoom] = useState(15);
+  const [routePoints, setRoutePoints] = useState([]);
   const [region, setRegion] = useState({
     latitude: 20.6408526,
     longitude: -87.0733932,
@@ -101,12 +101,10 @@ function DashboardScreen({ navigation }: any) {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <View style={styles.header}>
-            
             <TouchableOpacity
               style={styles.menuButton}
               onPress={() => navigation.openDrawer()}
             >
-              
               <Entypo name="menu" size={24} color="#000" />
             </TouchableOpacity>
             <View style={styles.searchBarContainer}>
@@ -142,8 +140,19 @@ function DashboardScreen({ navigation }: any) {
             <MapView
               style={{ flex: 1, width: '100%', height: '100%' }}
               region={region}
+              onPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setRoutePoints([...routePoints, { latitude, longitude }]);
+              }}
             >
               <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+              {routePoints.length > 1 && (
+                <Polyline
+                  coordinates={routePoints}
+                  strokeColor="#0B7D03"
+                  strokeWidth={4}
+                />
+              )}
             </MapView>
 
             <View style={styles.zoomButtonsContainer}>
@@ -198,51 +207,130 @@ function DashboardScreen({ navigation }: any) {
                 />
               </TouchableOpacity>
             </View>
+
+            <View style={{ position: 'absolute', bottom: 90, right: 20, zIndex: 30 }}>
+              <TouchableOpacity
+                style={styles.alertButton}
+                onPress={async () => {
+                  try {
+                    const response = await fetch('http://TU_BACKEND_URL/api/rutas', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        puntos: routePoints,
+                        fecha: new Date().toISOString(),
+                        usuarioId: 'ID_DEL_USUARIO_AUTENTICADO',
+                      }),
+                    });
+                    const json = await response.json();
+                    alert('Ruta guardada con éxito');
+                    setRoutePoints([]);
+                  } catch (err) {
+                    console.error(err);
+                    alert('Error al guardar la ruta');
+                  }
+                }}
+              >
+                <Ionicons name="save-outline" size={24} color="#0B7D03" />
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <BottomSheet height={500} ref={bottomSheet}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' }}>
-              <TouchableOpacity style={{ width: 83, height: 25, backgroundColor: 'white', borderRadius: 10, borderColor: 'black', borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                <Ionicons name="home" size={20} color="green" />
-                <Text>Casa</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ width: 83, height: 25, backgroundColor: 'white', borderRadius: 10, borderColor: 'black', borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                <Ionicons name="school" size={20} color="brown" />
-                <Text>Escuela</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ width: 83, height: 25, backgroundColor: 'white', borderRadius: 10, borderColor: 'black', borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                <Ionicons name="briefcase" size={20} color="orange" />
-                <Text>Trabajo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ width: 83, height: 25, backgroundColor: 'white', borderRadius: 10, borderColor: 'black', borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                <Ionicons name="location-sharp" size={20} color="red" />
-                <Text>Otro</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View>
-              <Text style={{fontWeight: 'bold', fontSize: 20, marginLeft: 30, marginTop: 20}}>Tus últimas rutas</Text>
-              <Text style={{marginLeft: 30, marginTop: 12}}>Aqui apareceran tus ultimas rutas</Text>
-              <View style={{ flexDirection: 'row', marginTop: 10, alignItems: 'center', justifyContent: 'center' }}>
-                <TouchableOpacity style={styles.recentRouteBox} />
-                <TouchableOpacity style={styles.recentRouteBox} />
-                <TouchableOpacity style={styles.recentRouteBox} /> 
-                
+          <BottomSheet height={600} ref={bottomSheet}>
+             <ScrollView>
+              {/* BOTONES CASA, ESCUELA, TRABAJO, OTRO */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  padding: 20,
+                }}
+              >
+                <TouchableOpacity style={styles.placeButton}>
+                  <Ionicons name="home" size={20} color="green" />
+                  <Text>Casa</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.placeButton}>
+                  <Ionicons name="school" size={20} color="brown" />
+                  <Text>Escuela</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.placeButton}>
+                  <Ionicons name="briefcase" size={20} color="orange" />
+                  <Text>Trabajo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.placeButton}>
+                  <Ionicons name="location-sharp" size={20} color="red" />
+                  <Text>Otro</Text>
+                </TouchableOpacity>
               </View>
-            </View>
 
-            <View style={styles.containersGreen}>
-              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Rutas recientes</Text>
-              <Text style={{ marginTop: 10 }}>Aquí aparecerán tus rutas recientes.</Text>
-            </View>
-            <View style={styles.containersGreen}>
-              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Rutas recientes</Text>
-              <Text style={{ marginTop: 10 }}>Aquí aparecerán tus rutas recientes.</Text>
-            </View>
-            <View style={styles.containersGreen}>
-              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Rutas recientes</Text>
-              <Text style={{ marginTop: 10 }}>Aquí aparecerán tus rutas recientes.</Text>
-            </View>
+              {/* ÚLTIMAS RUTAS */}
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 20,
+                  marginLeft: 20,
+                  marginTop: 10,
+                }}
+              >
+                Tus últimas rutas
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 10,
+                  justifyContent: "center",
+                }}
+              >
+                <View style={styles.recentRouteBox} />
+                <View style={styles.recentRouteBox} />
+                <View style={styles.recentRouteBox} />
+              </View>
+
+              {/* NOTIFICACIONES SEGURIDAD */}
+              <View style={styles.cardGreen}>
+                <Text style={styles.cardTitle}>NOTIFICACIONES DE SEGURIDAD</Text>
+                <Text>¡Atención! Incidentes reportados en la zona</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("notificaciones")}
+                >
+                  <Text style={styles.link}>Ver notificaciones</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* REPORTAR INCIDENTE */}
+              <View style={styles.cardYellow}>
+                <Text style={styles.cardTitle}>REPORTAR INCIDENTE</Text>
+                <Text>Ayuda a mejorar las rutas reportando incidentes</Text>
+                <TouchableOpacity
+                  style={styles.reportButtonBig}
+                  onPress={() => navigation.navigate("reportarBache")}
+                >
+                  <Text
+                    style={{
+                      color: "#fff",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Reportar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* HISTORIAL DE RUTAS */}
+              <View style={styles.cardBlue}>
+                <Text style={styles.cardTitle}>HISTORIAL DE RUTAS</Text>
+                <Text>Sin registros de rutas</Text>
+                <TouchableOpacity>
+                  <Text style={styles.link} onPress={() => navigation.navigate("historial")}>
+                    Historial completo
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </BottomSheet>
         </View>
       </TouchableWithoutFeedback>
@@ -250,88 +338,79 @@ function DashboardScreen({ navigation }: any) {
   );
 }
 
-
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#fff" },
   header: {
-    position: 'absolute',
+    position: "absolute",
     top: 40,
     left: 20,
     right: 20,
     zIndex: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   menuButton: {
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 5,
   },
   searchBarContainer: {
     flex: 1,
     marginLeft: 10,
-    position: 'relative',
+    position: "relative",
     zIndex: 100,
   },
   inputGO: {
-    width: '90%',
+    width: "90%",
     height: 50,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    borderColor: 'black',
+    borderColor: "black",
     borderWidth: 1,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
-  fakeMap: {
-    flex: 1,
-    backgroundColor: '#CCE8D0',
-  },
+  fakeMap: { flex: 1, backgroundColor: "#CCE8D0" },
   zoomButtonsContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     left: 20,
-    flexDirection: 'column',
+    flexDirection: "column",
     zIndex: 20,
   },
   zoomButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
     marginVertical: 5,
     elevation: 5,
   },
-  zoomButtonText: {
-    fontSize: 24,
-    color: '#0B7D03',
-    fontWeight: 'bold',
-  },
+  zoomButtonText: { fontSize: 24, color: "#0B7D03", fontWeight: "bold" },
   centerBottomButtonContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 30,
   },
   centerBottomButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
     borderRadius: 25,
     paddingHorizontal: 30,
     paddingVertical: 12,
     elevation: 5,
   },
   reportButtonContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 20,
     zIndex: 30,
@@ -340,32 +419,59 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 25,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 5,
-  },
-  containerSheet: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
   },
   recentRouteBox: {
     width: 100,
     height: 60,
-    backgroundColor: '#C4C4C4',
+    backgroundColor: "#C4C4C4",
     borderRadius: 5,
     marginHorizontal: 5,
-    marginTop: 20,
-    marginLeft: 20,
   },
-  containersGreen: {
-    width: '90%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#C8E6C9',
+  placeButton: {
+    width: 72,
+    height: 35,
+    backgroundColor: "white",
+    borderRadius: 8,
+    borderColor: "black",
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginHorizontal: 5,
+  },
+  cardGreen: {
+    backgroundColor: "#eaf8ea",
+    padding: 16,
     borderRadius: 10,
+    marginHorizontal: 20,
     marginTop: 20,
-    marginLeft: 25,
+  },
+  cardYellow: {
+    backgroundColor: "#fef8e6",
+    padding: 16,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  cardBlue: {
+    backgroundColor: "#eef6f9",
+    padding: 16,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  cardTitle: { fontWeight: "bold", marginBottom: 5 },
+  link: { color: "green", marginTop: 5, fontWeight: "bold" },
+  reportButtonBig: {
+    backgroundColor: "orange",
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 8,
   },
 });
+

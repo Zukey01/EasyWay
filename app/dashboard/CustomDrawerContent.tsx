@@ -63,13 +63,13 @@ export default function CustomDrawerContent() {
 
           <View style={styles.contenedor}>
             <Ionicons name="settings-outline" size={40} color="#0B7D03" />
-            <TouchableOpacity style={styles.botom}>
+            <TouchableOpacity style={styles.botom} onPress={() => navigation.navigate('ajustes')}>
               <Text style={styles.botomText}>Ajustes</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.contenedor}>
-            <Ionicons name="help-circle-outline" size={40} color="#0B7D03" />
+            <Ionicons name="person-circle-outline" size={40} color="#0B7D03" />
             <TouchableOpacity style={styles.botom} onPress={() => navigation.navigate('contacto')}>
               <Text style={styles.botomText}>Contacto</Text>
             </TouchableOpacity>
